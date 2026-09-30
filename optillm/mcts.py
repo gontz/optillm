@@ -141,6 +141,17 @@ class MCTS:
         completions = [choice.message.content.strip() for choice in response.choices if choice.message.content is not None]
         self.completion_tokens += response.usage.completion_tokens
         logger.info(f"Received {len(completions)} completions from the model")
+
+        # Some providers (e.g. Ollama) ignore n and return a single choice: request the rest one by one
+        single_request = {k: v for k, v in provider_request.items() if k != "n"}
+        for _ in range(n - len(completions)):
+            response = self.client.chat.completions.create(**single_request)
+            if self.request_id:
+                response_dict = response.model_dump() if hasattr(response, 'model_dump') else response
+                conversation_logger.log_provider_call(self.request_id, single_request, response_dict)
+            if response and response.choices and response.choices[0].message.content is not None:
+                completions.append(response.choices[0].message.content.strip())
+                self.completion_tokens += response.usage.completion_tokens
         return completions
 
     def apply_action(self, state: DialogueState, action: str) -> DialogueState:

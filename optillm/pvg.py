@@ -48,6 +48,16 @@ def generate_solutions(client, system_prompt: str, query: str, model: str, num_s
     
     pvg_completion_tokens += response.usage.completion_tokens
     solutions = [choice.message.content for choice in response.choices]
+
+    # Some providers (e.g. Ollama) ignore n and return a single choice: request the rest one by one
+    single_request = {k: v for k, v in provider_request.items() if k != "n"}
+    for _ in range(num_solutions - len(solutions)):
+        response = client.chat.completions.create(**single_request)
+        if hasattr(optillm, 'conversation_logger') and optillm.conversation_logger and request_id:
+            response_dict = response.model_dump() if hasattr(response, 'model_dump') else response
+            optillm.conversation_logger.log_provider_call(request_id, single_request, response_dict)
+        pvg_completion_tokens += response.usage.completion_tokens
+        solutions.append(response.choices[0].message.content)
     logger.debug(f"Generated {role} solutions: {solutions}")
     return solutions
 

@@ -193,13 +193,16 @@ def run(
         total_tokens += response.usage.completion_tokens
         
         logger.info(f"Generated {len(candidates)} candidates using n parameter. Tokens: {total_tokens}")
-        
+        # Some providers (e.g. Ollama) ignore n and silently return a single choice
+        if len(candidates) < num_candidates:
+            raise Exception(f"Provider returned {len(candidates)} of {num_candidates} requested candidates")
+
     except Exception as e:
         logger.warning(f"n parameter not supported: {str(e)}")
         logger.info("Falling back to sequential generation")
-        
-        # Fallback: Generate candidates one by one
-        for i in range(num_candidates):
+
+        # Fallback: Generate the missing candidates one by one
+        for i in range(len(candidates), num_candidates):
             try:
                 response = client.chat.completions.create(
                     model=model,

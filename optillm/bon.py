@@ -44,13 +44,16 @@ def best_of_n_sampling(system_prompt: str, initial_query: str, client, model: st
         # Check if any valid completions were generated
         if not completions:
             raise Exception("No valid completions generated (all were None)")
+        # Some providers (e.g. Ollama) ignore n and silently return a single choice
+        if len(completions) < n:
+            raise Exception(f"Provider returned {len(completions)} of {n} requested completions")
 
     except Exception as e:
         logger.warning(f"n parameter not supported by provider: {str(e)}")
-        logger.info(f"Falling back to generating {n} completions one by one")
-        
-        # Fallback: Generate completions one by one in a loop
-        for i in range(n):
+        logger.info(f"Falling back to generating {n - len(completions)} completions one by one")
+
+        # Fallback: Generate the missing completions one by one in a loop
+        for i in range(len(completions), n):
             try:
                 provider_request = {
                     "model": model,
