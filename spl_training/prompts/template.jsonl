@@ -1,0 +1,13 @@
+# Copy this file and fill it with your own prompts, one JSON object per line.
+# Lines starting with # are skipped.
+#
+# "prompt"       required: the task, written as you would really ask it
+# "system"       optional: system prompt, defaults to "You are a helpful assistant."
+# "temperature"  optional: 0.8 to 1.0 suits creative work, 0.2 to 0.4 suits analysis
+#
+# Rules: use fictional brands or public information only. No client briefs,
+# unreleased strategies, financial data or interview transcripts (Closed Loop rule).
+# Aim for 15 or more prompts per kind of task so each problem type gets enough attempts.
+{"prompt": "Brainstorm 10 campaign concepts for a fictional coffee brand launching a cold brew range.", "temperature": 0.9}
+{"prompt": "A fictional gym loses members every March. Find three creative ways to keep them.", "temperature": 0.8, "system": "You are a senior strategist at a communications agency."}
+{"prompt": "Write three headline options for a fictional cinema reopening after renovation.", "temperature": 0.9}

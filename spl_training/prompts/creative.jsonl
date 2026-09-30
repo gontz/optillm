@@ -1,0 +1,45 @@
+# Creative training set for SPL. Fictional brands only, no client data.
+# Lines starting with # are skipped. Fields: prompt (required), system, temperature.
+# creative_ideation: brainstorming, concepts, naming
+{"prompt": "Brainstorm 10 campaign concepts for a regional bakery chain that wants students to visit between 14:00 and 17:00, its quietest hours. For each concept give a one-line idea and the insight behind it.", "temperature": 0.9}
+{"prompt": "Propose 12 names for a plant-based protein bar aimed at hikers. Group them by naming approach (descriptive, evocative, invented, playful) and flag any that could be hard to trademark.", "temperature": 0.9}
+{"prompt": "A city library wants people aged 25 to 35 to come back. Generate 8 ideas that do not involve books being the main attraction, and rank them by cost to run.", "temperature": 0.9}
+{"prompt": "Come up with 6 big ideas for the launch of an electric scooter sharing service in a hilly city where locals think scooters are only for flat streets.", "temperature": 0.9}
+{"prompt": "Generate 10 social media content series ideas for a family-run winery that has no budget for paid media. Each series should be repeatable weekly.", "temperature": 0.9}
+{"prompt": "A mineral water brand wants a summer activation at music festivals that people will talk about after the festival ends. Give 5 concepts with a short mechanic for each.", "temperature": 0.9}
+{"prompt": "Brainstorm tagline options for an insurance company that wants to sound human instead of corporate. Give 15 options across three tones: warm, witty, reassuring.", "temperature": 0.9}
+{"prompt": "Invent 7 ways a hardware store could turn its annual inventory clearance into an event people look forward to.", "temperature": 0.9}
+{"prompt": "Genereaza 8 idei de campanie pentru o retea de cafenele care vrea sa comunice ca foloseste doar lapte de la ferme locale. Pentru fiecare idee: titlu, mecanica, de ce ar functiona.", "temperature": 0.9}
+{"prompt": "A telecom brand is sponsoring a national running event. Give 6 ideas that make the sponsorship visible without putting logos everywhere.", "temperature": 0.9}
+{"prompt": "Propose 10 podcast concepts a law firm could produce that non-lawyers would actually listen to.", "temperature": 0.9}
+{"prompt": "Generate 8 CSR program ideas for a car manufacturer that go beyond planting trees, each tied to something the company is actually good at.", "temperature": 0.9}
+{"prompt": "Brainstorm 10 employer branding ideas for a logistics company struggling to hire young drivers.", "temperature": 0.9}
+{"prompt": "Da-mi 10 nume pentru un festival de street food organizat intr-un fost depou de tramvaie, cu o scurta explicatie pentru fiecare.", "temperature": 0.9}
+{"prompt": "Create 6 concepts for an Instagram filter or AR experience for a sunscreen brand that makes people think about UV exposure.", "temperature": 0.9}
+# creative_problem_solving: unconventional answers to constrained problems
+{"prompt": "A museum has a 5,000 euro budget and needs to double weekend visitors in three months. Traditional advertising is ruled out. Propose three unconventional solutions and explain the trade-offs of each.", "temperature": 0.8}
+{"prompt": "A restaurant loses customers every January. It cannot discount prices because of its premium positioning. Find creative ways to keep January revenue stable.", "temperature": 0.8}
+{"prompt": "A brand's mascot has become a meme for the wrong reasons. Retiring it would anger loyal fans. Find a creative way out that keeps both groups happy.", "temperature": 0.8}
+{"prompt": "An NGO needs volunteers for a beach clean-up on a weekday morning. Most people work. Design creative solutions to get at least 200 people there.", "temperature": 0.8}
+{"prompt": "A product launch event must happen in a small room that fits 40 people, but 400 journalists and influencers want in. Solve this creatively without livestreaming being the only answer.", "temperature": 0.8}
+{"prompt": "A dairy brand's packaging redesign confused older customers and sales dropped 12%. The new packaging cannot be withdrawn for six months. What creative fixes are possible?", "temperature": 0.8}
+{"prompt": "A city wants people to stop feeding pigeons in its main square. Fines and signs have failed. Come up with creative behavioural solutions.", "temperature": 0.8}
+{"prompt": "O companie de energie vrea sa explice o crestere de pret fara sa para ca se scuza sau ca ascunde ceva. Gaseste trei abordari creative si riscurile fiecareia.", "temperature": 0.8}
+{"prompt": "A bookstore competes with online retailers on price and loses. Find creative ways it can win on something other than price.", "temperature": 0.8}
+{"prompt": "A client wants a viral video but will not approve anything risky or funny. Find creative territory that is safe yet still shareable.", "temperature": 0.8}
+{"prompt": "A regional airline has frequent delays it cannot fix this year. Find creative ways to turn waiting time into something passengers value.", "temperature": 0.8}
+{"prompt": "A tech conference always has empty seats in the last session of each day. Propose creative mechanisms to keep attendance high.", "temperature": 0.8}
+{"prompt": "A brand is present in a supermarket aisle with 30 competitors and identical shelf space. Find creative in-store ideas that respect the retailer's strict rules on displays.", "temperature": 0.8}
+{"prompt": "A hospital wants to reduce missed appointments without sending more SMS reminders. Suggest creative approaches.", "temperature": 0.8}
+{"prompt": "A beer brand cannot advertise to under-18s, but the festival it sponsors is all-ages. Find creative ways to be present responsibly.", "temperature": 0.8}
+# creative_writing: copy and storytelling
+{"prompt": "Write a 120-word manifesto for a cycling brand whose belief is that the commute is the best part of the day.", "temperature": 0.9}
+{"prompt": "Write three versions of a radio spot script (30 seconds) for a local plumber: one funny, one emotional, one straight informative.", "temperature": 0.9}
+{"prompt": "Write the opening paragraph of a brand story for a 70-year-old family knife maker, avoiding the words heritage, tradition and passion.", "temperature": 0.9}
+{"prompt": "Scrie un text de 100 de cuvinte pentru ambalajul unei ciocolate artizanale, care sa povesteasca originea boabelor de cacao fara cliseuri.", "temperature": 0.9}
+{"prompt": "Write five short out-of-home headlines for a public transport campaign encouraging people to leave the car at home, each under eight words.", "temperature": 0.9}
+{"prompt": "Write a short press release opening (headline, subhead, first paragraph) for a fictional zero-waste grocery store opening its third location.", "temperature": 0.8}
+{"prompt": "Write a 60-second video script for an apprenticeship program at a furniture factory, told from the perspective of the wood.", "temperature": 0.9}
+{"prompt": "Write an apology email from a fictional online shop to customers after a delivery delay, that is honest, warm and contains no corporate phrases.", "temperature": 0.8}
+{"prompt": "Write three LinkedIn post drafts for a CEO of a fictional recycling startup announcing a funding round, each with a different angle.", "temperature": 0.8}
+{"prompt": "Write a children's story of 150 words that explains why bees matter, for a honey brand's packaging insert.", "temperature": 0.9}

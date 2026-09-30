@@ -2,7 +2,9 @@
 Functions for evaluating strategies in the System Prompt Learning (SPL) plugin.
 """
 
+import json
 import logging
+import re
 from datetime import datetime
 from typing import Dict, List, Optional, Tuple, Any
 
@@ -10,16 +12,89 @@ from optillm.plugins.spl.strategy import Strategy
 from optillm.plugins.spl.utils import extract_thinking
 from optillm.plugins.spl.prompts import (
     STRATEGY_EVALUATION_PROMPT,
-    STRATEGY_REFINEMENT_PROMPT
+    STRATEGY_REFINEMENT_PROMPT,
+    CREATIVE_QUALITY_PROMPT
 )
 from optillm.plugins.spl.config import (
     DEFAULT_MAX_TOKENS,
     MAX_STRATEGIES_FOR_INFERENCE,
-    MIN_SUCCESS_RATE_FOR_INFERENCE
+    MIN_SUCCESS_RATE_FOR_INFERENCE,
+    CREATIVE_PROBLEM_TYPES,
+    CREATIVE_CRITERIA,
+    CREATIVE_QUALITY_THRESHOLD,
+    CREATIVE_JUDGE_MODEL
 )
 
 # Setup logging
 logger = logging.getLogger(__name__)
+
+
+def parse_quality_scores(text: str) -> Optional[Dict[str, float]]:
+    """
+    Parse the judge's reply into {criterion: score}. Accepts a JSON object anywhere
+    in the text, or "criterion: n" pairs as a fallback. Returns None if any criterion
+    is missing or out of range.
+    """
+    scores = {}
+    for match in re.finditer(r"\{[^{}]*\}", text):
+        try:
+            data = json.loads(match.group(0))
+        except json.JSONDecodeError:
+            continue
+        if isinstance(data, dict):
+            scores = {k.lower(): v for k, v in data.items()}
+            break
+    if not scores:
+        for criterion in CREATIVE_CRITERIA:
+            m = re.search(rf"{criterion}\W+(\d(?:\.\d+)?)", text, re.IGNORECASE)
+            if m:
+                scores[criterion] = m.group(1)
+
+    result = {}
+    for criterion in CREATIVE_CRITERIA:
+        try:
+            value = float(scores[criterion])
+        except (KeyError, TypeError, ValueError):
+            return None
+        if not 1 <= value <= 5:
+            return None
+        result[criterion] = value
+    return result
+
+
+def evaluate_creative_quality(query: str, response: str, client, model: str) -> Optional[Dict[str, Any]]:
+    """
+    Score a creative response against the brief on CREATIVE_CRITERIA.
+
+    Returns:
+        {"scores": {criterion: score}, "average": float}, or None if the judge
+        call fails or its reply cannot be parsed.
+    """
+    judge_model = CREATIVE_JUDGE_MODEL or model
+    messages = [
+        {"role": "system", "content": CREATIVE_QUALITY_PROMPT},
+        {"role": "user", "content": f"Brief:\n{query}\n\nResponse:\n{response}"}
+    ]
+    try:
+        judge_response = client.chat.completions.create(
+            model=judge_model,
+            messages=messages,
+            temperature=0.1,
+            max_tokens=DEFAULT_MAX_TOKENS
+        )
+        final_text, _ = extract_thinking(judge_response.choices[0].message.content or "")
+    except Exception as e:
+        logger.error(f"Error scoring creative quality: {str(e)}")
+        return None
+
+    scores = parse_quality_scores(final_text)
+    if scores is None:
+        logger.warning(f"Could not parse creative quality scores from: '{final_text[:200]}'")
+        return None
+    average = sum(scores.values()) / len(scores)
+    logger.info(f"Creative quality ({judge_model}): {scores} -> average {average:.2f} "
+                f"(threshold {CREATIVE_QUALITY_THRESHOLD:.2f})")
+    return {"scores": scores, "average": average}
 
 def select_relevant_strategies(query: str, problem_type: str, db: Any, learning_mode: bool = False, max_strategies: int = MAX_STRATEGIES_FOR_INFERENCE) -> List[Strategy]:
     """
@@ -103,25 +178,37 @@ def select_relevant_strategies(query: str, problem_type: str, db: Any, learning_
     
     return qualified_strategies
 
-def evaluate_strategy_effectiveness(response: str, thinking: Optional[str], selected_strategies: List[Strategy], client, model: str) -> Dict[str, bool]:
+def evaluate_strategy_effectiveness(response: str, thinking: Optional[str], selected_strategies: List[Strategy], client, model: str,
+                                    query: Optional[str] = None, problem_type: Optional[str] = None) -> Dict[str, bool]:
     """
     Evaluate how effective each strategy was in generating the response.
-    
+
+    For creative problem types (when the query is given), a strategy is only effective
+    if it was applied AND the response reaches CREATIVE_QUALITY_THRESHOLD. If the
+    quality score cannot be obtained, only the application check is used.
+
     Args:
         response: The LLM's final response to the query
         thinking: The LLM's reasoning process (if any)
         selected_strategies: The strategies that were used
         client: LLM client for making API calls
         model: Model identifier
-    
+        query: The original query, needed for the creative quality check
+        problem_type: The classified problem type
+
     Returns:
         Dict[str, bool]: Mapping from strategy ID to effectiveness (True/False)
     """
     if not selected_strategies:
         return {}
-    
+
     results = {}
-    
+
+    # One quality score per response, shared by all strategies that shaped it
+    quality = None
+    if query and problem_type in CREATIVE_PROBLEM_TYPES:
+        quality = evaluate_creative_quality(query, response, client, model)
+
     try:
         for strategy in selected_strategies:
             # Include thinking in the evaluation if available
@@ -162,9 +249,14 @@ def evaluate_strategy_effectiveness(response: str, thinking: Optional[str], sele
             
             # Check for YES in the final answer (not in thinking blocks)
             is_effective = "YES" in final_result
-            
-            results[strategy.strategy_id] = is_effective
             logger.info(f"Strategy {strategy.strategy_id} evaluation: {final_result} -> {is_effective}")
+
+            if is_effective and quality is not None and quality["average"] < CREATIVE_QUALITY_THRESHOLD:
+                is_effective = False
+                logger.info(f"Strategy {strategy.strategy_id} applied, but creative quality "
+                            f"{quality['average']:.2f} is below {CREATIVE_QUALITY_THRESHOLD:.2f} -> False")
+
+            results[strategy.strategy_id] = is_effective
     
     except Exception as e:
         logger.error(f"Error evaluating strategy effectiveness: {str(e)}")

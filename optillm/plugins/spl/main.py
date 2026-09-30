@@ -33,6 +33,9 @@ from .config import (
 # Setup logging
 logger = logging.getLogger(__name__)
 
+# request_config keys that are not forwarded to the provider
+EXCLUDED_REQUEST_KEYS = {'spl_learning', 'stream', 'stream_options', 'n', 'optillm_approach'}
+
 def run_spl(system_prompt: str, initial_query: str, client, model: str, request_config: dict = None) -> Tuple[str, int]:
     """
     Main plugin function that implements system prompt learning.
@@ -146,10 +149,11 @@ def run_spl(system_prompt: str, initial_query: str, client, model: str, request_
     
     # 9. Forward the request to the LLM with the augmented prompt
     try:
-        # Create a copy of request_config without spl_learning
+        # Copy request_config without keys the provider must not see. The proxy
+        # streams our final text itself, and only the first choice is returned.
         request_params = {}
         if request_config:
-            request_params = {k: v for k, v in request_config.items() if k != 'spl_learning'}
+            request_params = {k: v for k, v in request_config.items() if k not in EXCLUDED_REQUEST_KEYS}
         
         # Ensure max_tokens is set to at least DEFAULT_MAX_TOKENS for reasoning LLMs
         if 'max_tokens' not in request_params:
@@ -186,7 +190,9 @@ def run_spl(system_prompt: str, initial_query: str, client, model: str, request_
                     thinking,
                     selected_strategies,
                     client,
-                    model
+                    model,
+                    query=initial_query,
+                    problem_type=problem_type
                 )
                 
                 # 11. Update strategy metrics based on effectiveness

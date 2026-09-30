@@ -115,9 +115,11 @@ Strategies are stored in JSON format in the `spl_data` directory:
 
 ## Configuration
 
-The SPL plugin maintains these core files:
-- **Strategy Database**: `/optillm/plugins/spl/data/strategies.json`
-- **Metrics**: `/optillm/plugins/spl/data/metrics.json`
+The SPL plugin maintains these core files in `~/.optillm/spl/` (override with the `OPTILLM_SPL_DATA_DIR` environment variable):
+- **Strategy Database**: `strategies.json`
+- **Metrics**: `metrics.json`
+
+On first use both files are copied from `optillm/plugins/spl/data/`, the strategies shipped with the package. Delete them to start learning from scratch.
 
 You can:
 1. Backup these files to preserve learned strategies

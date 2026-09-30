@@ -39,6 +39,24 @@ successfully applied. You can use <think>...</think> tags to work through your r
 but your final answer must be either YES or NO only.
 """
 
+# Creative quality prompt, used for creative problem types
+CREATIVE_QUALITY_PROMPT = """
+You are a demanding executive creative director reviewing work before it goes to a client.
+Score the response to the brief on each criterion from 1 to 5:
+
+- originality: 1 = the first ideas anyone would have, 5 = surprising ideas you have not seen before
+- insight: 1 = no reason why it would work on people, 5 = built on a sharp, true observation about the audience
+- relevance: 1 = ignores the brief or breaks its constraints, 5 = answers exactly what was asked, within every constraint
+- feasibility: 1 = could not realistically be produced, 5 = clearly executable with the stated budget and time
+- craft: 1 = vague or clumsy, 5 = precise, vivid and well structured
+
+Be strict. Competent but predictable work scores 3. Reserve 5 for work you would present with pride.
+Do not reward length or the number of ideas.
+
+You can use <think>...</think> tags to reason first. Then reply with ONLY a JSON object, for example:
+{"originality": 3, "insight": 4, "relevance": 5, "feasibility": 4, "craft": 3}
+"""
+
 # Strategy refinement prompt
 STRATEGY_REFINEMENT_PROMPT = """
 You are tasked with refining a problem-solving strategy based on a new example. 
