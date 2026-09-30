@@ -121,6 +121,11 @@ def get_config():
                 azure_ad_token_provider=token_provider,
                 http_client=http_client
             )
+    elif server_config['base_url'] != "":
+        # No provider key set: treat base_url as an OpenAI compatible endpoint (Ollama by default)
+        API_KEY = os.environ.get("OLLAMA_API_KEY", "ollama")
+        default_client = OpenAI(api_key=API_KEY, base_url=server_config['base_url'], http_client=http_client)
+        logger.info(f"Created OpenAI compatible client for {server_config['base_url']}")
     else:
         # Import the LiteLLM wrapper
         from optillm.litellm_wrapper import LiteLLMWrapper
@@ -1081,7 +1086,7 @@ def parse_args():
         ("--mcts-simulations", "OPTILLM_SIMULATIONS", int, 2, "Number of MCTS simulations"),
         ("--mcts-exploration", "OPTILLM_EXPLORATION", float, 0.2, "Exploration weight for MCTS"),
         ("--mcts-depth", "OPTILLM_DEPTH", int, 1, "Simulation depth for MCTS"),
-        ("--model", "OPTILLM_MODEL", str, "gpt-4o-mini", "OpenAI model to use"),
+        ("--model", "OPTILLM_MODEL", str, "qwen3.8:latest", "Model to use (defaults to a local Ollama model)"),
         ("--rstar-max-depth", "OPTILLM_RSTAR_MAX_DEPTH", int, 3, "Maximum depth for rStar algorithm"),
         ("--rstar-num-rollouts", "OPTILLM_RSTAR_NUM_ROLLOUTS", int, 5, "Number of rollouts for rStar algorithm"),
         ("--rstar-c", "OPTILLM_RSTAR_C", float, 1.4, "Exploration constant for rStar algorithm"),
@@ -1118,7 +1123,10 @@ def parse_args():
                         help="Number of samples for best_of_n approach")
 
     # Special handling for base_url to support both formats
-    base_url_default = os.environ.get("OPTILLM_BASE_URL", "")
+    # Default to a local Ollama server when no hosted provider key is configured
+    provider_keys = ("OPTILLM_API_KEY", "CEREBRAS_API_KEY", "OPENAI_API_KEY", "AZURE_OPENAI_API_KEY")
+    ollama_default = "" if any(os.environ.get(k) for k in provider_keys) else "http://localhost:11434/v1"
+    base_url_default = os.environ.get("OPTILLM_BASE_URL", ollama_default)
     parser.add_argument("--base-url", "--base_url", dest="base_url", type=str, default=base_url_default,
                         help="Base url for OpenAI compatible endpoint")
 
