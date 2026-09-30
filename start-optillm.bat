@@ -1,5 +1,5 @@
 @echo off
-rem Start the OptiLLM proxy against the local Ollama server.
+rem Start the OptiLLM proxy and its chat GUI against the local Ollama server.
 rem Extra arguments are passed through, e.g. start-optillm.bat --approach moa --model gemma4:26b
 setlocal
 cd /d "%~dp0"
@@ -17,7 +17,11 @@ if errorlevel 1 (
     goto :error
 )
 
-".venv\Scripts\optillm.exe" %*
+rem Open the chat GUI in the browser once the server has had time to start
+start "" /b cmd /c "timeout /t 10 /nobreak >nul & start http://127.0.0.1:7860"
+
+echo API: http://127.0.0.1:8000/v1   Chat GUI: http://127.0.0.1:7860
+".venv\Scripts\optillm.exe" --launch-gui %*
 goto :eof
 
 :error
